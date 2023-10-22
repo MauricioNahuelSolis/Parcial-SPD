@@ -1,0 +1,334 @@
+Esta segunda parte en terminos generales, tiene un funcionamiento similar a la primera parte, se le agregan algunas funciones y elementos como un interruptor deslizante, un sensor
+de temperatura y un motor cc.
+Primero se elimino el boton de reset, se incluyo un interruptor deslizante, segun su estado, los botones de subir y bajar muestran en los displays todos los numero entre 0 y 99 o los
+numeros primos. Si el interruptor esta activado se van a mostrar todos los numero del 0 a 99, si el interruptor no esta activo se mostraran los
+numero primos. En las funciones contarPrimos() y contarNumero() estan dos contadores uno para cada tipo de numeros (todos los numero y solo los numero primos) estas funciones se llaman
+en el loop segun el estado del interrupto deslizante. 
+La funcion esPrimo() toma un numero de contarPrimos() y verifica si es primo, si es asi retorna True para asi imrimir el numero en el display, en un for se verifica si si el número
+es divisible por algún entero desde 2 hasta la raíz cuadrada del número en caso de retornar False, el numero no es primo, en caso contrario se retorna True.
+
+Por otro lado se incorporo un sensor de temperatura, del cual leemos su salida con la funcion map(), los que hace map() es escalar la lectura analogica del sensor que es 0, 1023 a un
+rango de temperatura de -50 a 450, el valor de la temperatura la toma la funcion encenderMotor() que, si la temperatura es mayor 24 se enciende el motor, si la temperatura desciende de 24
+el motor se apaga.
+
+// C++ code
+// Mauricio Solis del Castillo
+// parte dos
+#define A 13
+#define B 12
+#define C 11
+#define D 10
+#define E 9
+#define F 8
+#define G 7
+#define SUBE 3
+#define BAJA 2
+
+#define UNIDAD A4
+#define DECENA A5
+#define APAGADOS 0
+#define TIMEDISPLAYON 5
+
+
+int contadorDigito = 0;
+int contadorDigitoPrimo = 0;
+int sube = 1;
+int subePrevia = 1;
+int baja = 1;
+int bajaPrevia = 1;
+int reset = 1;
+int resetPrevia = 1;
+
+int interruptor = 5;
+int ultimoPrimo;
+bool primo;
+
+//sensor de temperatura y motor
+int tmp = 0;
+int motor = 6;
+
+float temperatura = 0;
+
+void setup()
+{
+  pinMode(BAJA, INPUT_PULLUP);
+  pinMode(SUBE, INPUT_PULLUP);
+  
+  pinMode(C, OUTPUT);
+  pinMode(D, OUTPUT);
+  pinMode(E, OUTPUT);
+  pinMode(G, OUTPUT);
+  pinMode(F, OUTPUT);
+  pinMode(A, OUTPUT);
+  pinMode(B, OUTPUT);
+  pinMode(UNIDAD, OUTPUT);
+  pinMode(DECENA, OUTPUT);
+  digitalWrite(UNIDAD, 0);
+  digitalWrite(DECENA, 0);
+  imprimirDigito(0);
+  
+  pinMode(interruptor, INPUT);
+  pinMode(motor, OUTPUT);
+}
+
+void loop()
+{	
+  temperatura = map(analogRead(tmp), 0, 1023, -50, 450);
+  
+  encenderMotor(temperatura);
+  
+  int valorInterruptor = digitalRead(interruptor);
+  if(valorInterruptor == 1)
+  {
+    contarNumeros();
+  }
+  else
+  {
+    contarPrimos();
+  }
+}
+
+void contarNumeros()
+{
+  int boton = botonPresionado();
+  if (boton == SUBE)
+  {
+    contadorDigito++;
+    if (contadorDigito > 99)
+    {
+      contadorDigito = 0;
+    }
+  } 
+  else if (boton == BAJA)
+  {
+    contadorDigito--;
+    if (contadorDigito < 0)
+    {
+      contadorDigito = 99;
+    }
+  }
+  imprimirCuenta(contadorDigito);
+}
+
+void contarPrimos()
+{
+  int boton = botonPresionado();
+  if (boton == SUBE)
+  {
+    contadorDigitoPrimo++;
+    if (contadorDigitoPrimo > 99)
+    {
+      contadorDigitoPrimo = 0;
+    }
+  } 
+  else if (boton == BAJA)
+  {
+    contadorDigitoPrimo--;
+    if (contadorDigitoPrimo < 0)
+    {
+      contadorDigitoPrimo = 99;
+    }
+  }
+  primo = esPrimo(contadorDigitoPrimo);
+
+  if(primo)
+  {
+    ultimoPrimo = contadorDigitoPrimo;
+    imprimirCuenta(contadorDigitoPrimo);
+  }
+  else
+  {
+    imprimirCuenta(ultimoPrimo);
+  }
+}
+int botonPresionado(void) // CHEQUEA SI SE PRESIONO UNA TECLA Y SI LA TECLA NO ESTABA YA APRETADA
+{
+	sube = digitalRead(SUBE);
+  baja = digitalRead(BAJA);
+  
+  if (sube)  // Pregunto si la tecla no esta presionada
+  {
+    subePrevia = 1;
+  }
+  if (baja)
+  {
+    bajaPrevia = 1;
+  }
+  if (sube == 0 && sube != subePrevia)
+  {
+    subePrevia = sube;
+    return SUBE;
+  }
+  if (baja == 0 && baja != bajaPrevia)
+  {
+    bajaPrevia = baja;
+    return BAJA;
+  }
+ return 0;
+}
+
+void prendeDigito(int digito)
+{
+	if (digito == UNIDAD)
+  {
+    digitalWrite(UNIDAD, LOW);
+    digitalWrite(DECENA, HIGH);
+    delay(TIMEDISPLAYON);
+  }
+  else if (digito == DECENA)
+  {
+    digitalWrite(UNIDAD, HIGH);
+    digitalWrite(DECENA, LOW);
+    delay(TIMEDISPLAYON);
+  }
+  else
+  {
+    digitalWrite(UNIDAD, HIGH);
+    digitalWrite(DECENA, HIGH);
+  }
+}
+
+void imprimirCuenta(int cuenta)
+{
+	prendeDigito(APAGADOS);
+  imprimirDigito(cuenta / 10);
+  prendeDigito(DECENA);
+  prendeDigito(APAGADOS);
+  imprimirDigito(cuenta - 10 * ((int)cuenta / 10));
+ 	prendeDigito(UNIDAD); 
+}
+
+bool esPrimo(int numero)
+{
+  // Si el número es menor o igual a 1, no es primo
+  if (numero <= 1) 
+  {
+    return false;
+  }
+  // Comprobamos si el número es divisible por algún entero desde 2 hasta la raíz cuadrada del número
+  for (int i = 2; i * i <= numero; i++) 
+  {
+    if (numero % i == 0) 
+    {
+      // Si es divisible, no es primo
+      return false;
+    }
+  }
+	// Si no se encontraron divisores, es primo
+  return true;
+}
+void imprimirDigito(int digito)
+{
+	digitalWrite(A, LOW);
+  digitalWrite(B, LOW);
+	digitalWrite(C, LOW);
+	digitalWrite(D, LOW);
+  digitalWrite(E, LOW);
+  digitalWrite(F, LOW);
+  digitalWrite(G, LOW);
+  
+  switch (digito)
+  {
+    case 1:
+    {
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      break;
+    }
+    case 2:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(E, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 3:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 4:
+    {
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(F, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 5:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(F, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 6:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(E, HIGH);
+      digitalWrite(F, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 7:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      break;
+    }
+    case 8:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(E, HIGH);
+      digitalWrite(F, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 9:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(F, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 0:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(E, HIGH);
+      digitalWrite(F, HIGH);
+      break;
+    }  	
+  }   	
+}
+
+void encenderMotor (float temperatura)
+{
+  if(temperatura > 24)
+  {
+    digitalWrite(motor, HIGH);
+  }
+  else if(temperatura <= 24)
+  {
+    digitalWrite(motor, LOW);
+  }
+}
