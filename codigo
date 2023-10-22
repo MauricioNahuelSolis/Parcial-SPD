@@ -45,190 +45,200 @@ void setup()
 
 void loop()
 {
-    int boton = botonPresionado();
-  	if (boton == SUBE)
-    {
-      contadorDigito++;
-      if (contadorDigito > 99)
-        contadorDigito = 0; 
-    } 
-  	else if (boton == BAJA)
-    {
-      contadorDigito--;
-      if (contadorDigito < 0)
-        contadorDigito = 99;
-    }
-  	else if (boton == RESET)
+  int boton = botonPresionado();
+  if (boton == SUBE)
+  {
+    contadorDigito++;
+    if (contadorDigito > 99)
     {
       contadorDigito = 0;
     } 
-  	imprimirCuenta(contadorDigito); 
+  } 
+  else if (boton == BAJA)
+  {
+    contadorDigito--;
+    if (contadorDigito < 0)
+    {
+      contadorDigito = 99;
+    } 
+  }
+  else if (boton == RESET)
+  {
+    contadorDigito = 0;
+  } 
+  imprimirCuenta(contadorDigito);
 }
+
+
 int botonPresionado(void) // CHEQUEA SI SE PRESIONO UNA TECLA Y SI LA TECLA NO ESTABA YA APRETADA
 {
 	sube = digitalRead(SUBE);
-  	baja = digitalRead(BAJA);
-  	reset = digitalRead(RESET);
+  baja = digitalRead(BAJA);
+  reset = digitalRead(RESET);
   
-  	if (sube)  // Pregunto si la tecla no esta presionada
-      subePrevia = 1;
-  	if (baja)
-      bajaPrevia = 1;
-  	if (reset)
-      resetPrevia = 1;
+  if (sube)  // Pregunto si la tecla no esta presionada
+  {
+    subePrevia = 1;
+  }
+  if (baja)
+  {
+    bajaPrevia = 1;
+  }
+  if (reset)
+  {
+    resetPrevia = 1;
+  }
+  if (sube == 0 && sube != subePrevia)
+  {
+    subePrevia = sube;
+    return SUBE;
+  }
   
-  	if (sube == 0 && sube != subePrevia)
-    {
-      subePrevia = sube;
-      return SUBE;
-    }
-  	
-  	if (baja == 0 && baja != bajaPrevia)
-    {
-      bajaPrevia = baja;
-      return BAJA;
-    }
-  
-  	if (reset == 0 && reset != resetPrevia)
-    {
-      resetPrevia = reset;
-      return RESET;
-    }
- return 0;
+  if (baja == 0 && baja != bajaPrevia)
+  {
+    bajaPrevia = baja;
+    return BAJA;
+  }
+
+  if (reset == 0 && reset != resetPrevia)
+  {
+    resetPrevia = reset;
+    return RESET;
+  }
+  return 0;
 }
 
 void prendeDigito(int digito)
 {
 	if (digito == UNIDAD)
-    {
-      digitalWrite(UNIDAD, LOW);
-      digitalWrite(DECENA, HIGH);
-      delay(TIMEDISPLAYON);
-    }
-  	else if (digito == DECENA)
-    {
-      digitalWrite(UNIDAD, HIGH);
-      digitalWrite(DECENA, LOW);
-      delay(TIMEDISPLAYON);
-    }
-  	else
-    {
-      digitalWrite(UNIDAD, HIGH);
-      digitalWrite(DECENA, HIGH);
-    }
-	
+  {
+    digitalWrite(UNIDAD, LOW);
+    digitalWrite(DECENA, HIGH);
+    delay(TIMEDISPLAYON);
+  }
+  else if (digito == DECENA)
+  {
+    digitalWrite(UNIDAD, HIGH);
+    digitalWrite(DECENA, LOW);
+    delay(TIMEDISPLAYON);
+  }
+  else
+  {
+    digitalWrite(UNIDAD, HIGH);
+    digitalWrite(DECENA, HIGH);
+  }
 }
 
 void imprimirCuenta(int cuenta)
 {
 	prendeDigito(APAGADOS);
-  	imprimirDigito(cuenta / 10);
-    prendeDigito(DECENA);
-  	prendeDigito(APAGADOS);
-  	imprimirDigito(cuenta - 10 * ((int)cuenta / 10));
+  imprimirDigito(cuenta / 10);
+  prendeDigito(DECENA);
+  prendeDigito(APAGADOS);
+  imprimirDigito(cuenta - 10 * ((int)cuenta / 10));
  	prendeDigito(UNIDAD); 
 }
 
 void imprimirDigito(int digito)
 {
 	digitalWrite(A, LOW);
-  	digitalWrite(B, LOW);
-  	digitalWrite(C, LOW);
-  	digitalWrite(D, LOW);
-  	digitalWrite(E, LOW);
-  	digitalWrite(F, LOW);
-  	digitalWrite(G, LOW);
+  digitalWrite(B, LOW);
+  digitalWrite(C, LOW);
+  digitalWrite(D, LOW);
+  digitalWrite(E, LOW);
+  digitalWrite(F, LOW);
+  digitalWrite(G, LOW);
   
-  	switch (digito)
+  switch (digito)
+  {
+    case 1:
     {
-      case 1:
-      	{
-            digitalWrite(B, HIGH);
-  			digitalWrite(C, HIGH);
-         	break;
-        }
-      case 2:
-      	{
-            digitalWrite(A, HIGH);
-  			digitalWrite(B, HIGH);
-          	digitalWrite(D, HIGH);
-  			digitalWrite(E, HIGH);
-          	digitalWrite(G, HIGH);
-         	break;
-        }
-      case 3:
-      	{
-            digitalWrite(A, HIGH);
-  			digitalWrite(B, HIGH);
-          	digitalWrite(C, HIGH);
-  			digitalWrite(D, HIGH);
-          	digitalWrite(G, HIGH);
-         	break;
-        }
-      case 4:
-      	{
-            digitalWrite(B, HIGH);
-  			digitalWrite(C, HIGH);
-          	digitalWrite(F, HIGH);
-  			digitalWrite(G, HIGH);
-         	break;
-        }
-      case 5:
-      	{
-            digitalWrite(A, HIGH);
-  			digitalWrite(C, HIGH);
-          	digitalWrite(D, HIGH);
-  			digitalWrite(F, HIGH);
-          	digitalWrite(G, HIGH);
-         	break;
-        }
-      case 6:
-      	{
-            digitalWrite(A, HIGH);
-  			digitalWrite(C, HIGH);
-          	digitalWrite(D, HIGH);
-  			digitalWrite(E, HIGH);
-          	digitalWrite(F, HIGH);
-  			digitalWrite(G, HIGH);
-         	break;
-        }
-      case 7:
-      	{
-          	digitalWrite(A, HIGH);
-            digitalWrite(B, HIGH);
-  			digitalWrite(C, HIGH);
-         	break;
-        }
-      case 8:
-      	{
-            digitalWrite(A, HIGH);
-  			digitalWrite(B, HIGH);
-  			digitalWrite(C, HIGH);
-  			digitalWrite(D, HIGH);
-  			digitalWrite(E, HIGH);
-  			digitalWrite(F, HIGH);
-  			digitalWrite(G, HIGH);
-         	break;
-        }
-      case 9:
-      	{
-            digitalWrite(A, HIGH);
-  			digitalWrite(B, HIGH);
-  			digitalWrite(C, HIGH);
-  			digitalWrite(D, HIGH);
-          	digitalWrite(F, HIGH);
-  			digitalWrite(G, HIGH);
-         	break;
-        }
-      case 0:
-      	{
-            digitalWrite(A, HIGH);
-  			digitalWrite(B, HIGH);
-  			digitalWrite(C, HIGH);
-  			digitalWrite(D, HIGH);
-          	digitalWrite(E, HIGH);
-  			digitalWrite(F, HIGH);
-         	break;
-        }    	
-    }  
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      break;
+    }
+    case 2:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(E, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 3:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 4:
+    {
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(F, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 5:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(F, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 6:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(E, HIGH);
+      digitalWrite(F, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 7:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      break;
+    }
+    case 8:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(E, HIGH);
+      digitalWrite(F, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 9:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(F, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 0:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(E, HIGH);
+      digitalWrite(F, HIGH);
+      break;
+    }  	
+  }   	
 }
