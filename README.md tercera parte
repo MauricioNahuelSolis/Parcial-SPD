@@ -1,0 +1,341 @@
+En la parte 3 del proyecto se incluyo un sensor de luz ambiental que segun la cantidad de luz que recibe se mueve mas o menos rapido el motor, tambien se incluyo un led que prende y apaga
+cuando el motor esta prendido, en el loop() se incluyo la lectura analogica del sensor de luz y con la funcion map() se escala los valores recibidos (0 - 1023) a (1 - 254), el valor recibido
+lo toma la funcion encenderMotor() que fue modificada poder darle las revolucion leidas al motor, la funcion ledAlerta() lo que hace es prender y apagar un led. 
+
+// C++ code
+// Mauricio Solis del Castillo
+// parte tres
+#define A 13
+#define B 12
+#define C 11
+#define D 10
+#define E 9
+#define F 8
+#define G 7
+#define SUBE 3
+#define BAJA 2
+
+#define UNIDAD A4
+#define DECENA A5
+#define APAGADOS 0
+#define TIMEDISPLAYON 5
+
+
+int contadorDigito = 0;
+int contadorDigitoPrimo = 0;
+int sube = 1;
+int subePrevia = 1;
+int baja = 1;
+int bajaPrevia = 1;
+int reset = 1;
+int resetPrevia = 1;
+
+int interruptor = 6;
+int ultimoPrimo;
+bool primo;
+
+//sensor de temperatura y motor
+int tmp = 0;
+int motor = 5;
+float temperatura = 0;
+
+int led = 4;
+//sensor de luz ambiental
+int sensorLuz = 1;
+int luz = 0;
+void setup()
+{
+  pinMode(BAJA, INPUT_PULLUP);
+  pinMode(SUBE, INPUT_PULLUP);
+  
+  pinMode(C, OUTPUT);
+  pinMode(D, OUTPUT);
+  pinMode(E, OUTPUT);
+  pinMode(G, OUTPUT);
+  pinMode(F, OUTPUT);
+  pinMode(A, OUTPUT);
+  pinMode(B, OUTPUT);
+  pinMode(UNIDAD, OUTPUT);
+  pinMode(DECENA, OUTPUT);
+  digitalWrite(UNIDAD, 0);
+  digitalWrite(DECENA, 0);
+  imprimirDigito(0);
+  
+  pinMode(interruptor, INPUT);
+  pinMode(motor, OUTPUT);
+  pinMode(led, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop()
+{	
+  temperatura = map(analogRead(tmp), 0, 1023, -50, 450);
+  luz = map(analogRead(sensorLuz), 0, 1023, 254, 1);
+  Serial.println(luz);
+  
+  encenderMotor(temperatura, luz);
+  
+  int valorInterruptor = digitalRead(interruptor);
+  if(valorInterruptor == 1)
+  {
+    contarNumeros();
+  }
+  else
+  {
+    contarPrimos();
+  }
+}
+
+void contarNumeros()
+{
+  int boton = botonPresionado();
+  if (boton == SUBE)
+  {
+    contadorDigito++;
+    if (contadorDigito > 99)
+    {
+      contadorDigito = 0;
+    }
+  } 
+  else if (boton == BAJA)
+  {
+    contadorDigito--;
+    if (contadorDigito < 0)
+    {
+      contadorDigito = 99;
+    }
+  }
+  imprimirCuenta(contadorDigito);
+}
+
+void contarPrimos()
+{
+  int boton = botonPresionado();
+  if (boton == SUBE)
+  {
+    contadorDigitoPrimo++;
+    if (contadorDigitoPrimo > 99)
+    {
+      contadorDigitoPrimo = 0;
+    }
+  } 
+  else if (boton == BAJA)
+  {
+    contadorDigitoPrimo--;
+    if (contadorDigitoPrimo < 0)
+    {
+      contadorDigitoPrimo = 99;
+    }
+  }
+  primo = esPrimo(contadorDigitoPrimo);
+
+  if(primo)
+  {
+    ultimoPrimo = contadorDigitoPrimo;
+    imprimirCuenta(contadorDigitoPrimo);
+  }
+  else
+  {
+    imprimirCuenta(ultimoPrimo);
+  }
+}
+int botonPresionado(void) // CHEQUEA SI SE PRESIONO UNA TECLA Y SI LA TECLA NO ESTABA YA APRETADA
+{
+	sube = digitalRead(SUBE);
+  baja = digitalRead(BAJA);
+  
+  if (sube)  // Pregunto si la tecla no esta presionada
+  {
+    subePrevia = 1;
+  }
+  if (baja)
+  {
+    bajaPrevia = 1;
+  }
+  if (sube == 0 && sube != subePrevia)
+  {
+    subePrevia = sube;
+    return SUBE;
+  }
+  if (baja == 0 && baja != bajaPrevia)
+  {
+    bajaPrevia = baja;
+    return BAJA;
+  }
+ return 0;
+}
+
+void prendeDigito(int digito)
+{
+	if (digito == UNIDAD)
+  {
+    digitalWrite(UNIDAD, LOW);
+    digitalWrite(DECENA, HIGH);
+    delay(TIMEDISPLAYON);
+  }
+  else if (digito == DECENA)
+  {
+    digitalWrite(UNIDAD, HIGH);
+    digitalWrite(DECENA, LOW);
+    delay(TIMEDISPLAYON);
+  }
+  else
+  {
+    digitalWrite(UNIDAD, HIGH);
+    digitalWrite(DECENA, HIGH);
+  }
+}
+
+void imprimirCuenta(int cuenta)
+{
+	prendeDigito(APAGADOS);
+  imprimirDigito(cuenta / 10);
+  prendeDigito(DECENA);
+  prendeDigito(APAGADOS);
+  imprimirDigito(cuenta - 10 * ((int)cuenta / 10));
+ 	prendeDigito(UNIDAD); 
+}
+
+bool esPrimo(int numero)
+{
+  // Si el número es menor o igual a 1, no es primo
+  if (numero <= 1) 
+  {
+    return false;
+  }
+  // Comprobamos si el número es divisible por algún entero desde 2 hasta la raíz cuadrada del número
+  for (int i = 2; i * i <= numero; i++) 
+  {
+    if (numero % i == 0) 
+    {
+      // Si es divisible, no es primo
+      return false;
+    }
+  }
+	// Si no se encontraron divisores, es primo
+  return true;
+}
+void imprimirDigito(int digito)
+{
+	digitalWrite(A, LOW);
+  digitalWrite(B, LOW);
+	digitalWrite(C, LOW);
+	digitalWrite(D, LOW);
+  digitalWrite(E, LOW);
+  digitalWrite(F, LOW);
+  digitalWrite(G, LOW);
+  
+  switch (digito)
+  {
+    case 1:
+    {
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      break;
+    }
+    case 2:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(E, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 3:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 4:
+    {
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(F, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 5:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(F, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 6:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(E, HIGH);
+      digitalWrite(F, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 7:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      break;
+    }
+    case 8:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+    digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(E, HIGH);
+      digitalWrite(F, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 9:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(F, HIGH);
+      digitalWrite(G, HIGH);
+      break;
+    }
+    case 0:
+    {
+      digitalWrite(A, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, HIGH);
+      digitalWrite(D, HIGH);
+      digitalWrite(E, HIGH);
+      digitalWrite(F, HIGH);
+      break;
+    }  	
+  }   	
+}
+
+void encenderMotor (float temperatura, int luz)
+{
+  if(temperatura > 24) // el calor es elevado
+  {
+    analogWrite(motor, luz);
+    ledAlerta();
+  }
+  else if(temperatura <= 24) // la temperatura mejoro
+  {
+    digitalWrite(motor, LOW);
+  }
+}
+
+void ledAlerta()
+{
+  digitalWrite(led, HIGH);
+  delay(500);
+  digitalWrite(led, LOW);
+  delay(500);
+}
