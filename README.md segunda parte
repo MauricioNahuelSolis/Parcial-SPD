@@ -1,3 +1,5 @@
+https://www.tinkercad.com/things/1GqFAJ8zTZL-parcial-parte-02/editel?sharecode=1nXT_MCZmsm4IsVync1qXGTlub-09vUqyT7wDJVf8Nk
+
 Esta segunda parte en terminos generales, tiene un funcionamiento similar a la primera parte, se le agregan algunas funciones y elementos como un interruptor deslizante, un sensor
 de temperatura y un motor cc.
 Primero se elimino el boton de reset, se incluyo un interruptor deslizante, segun su estado, los botones de subir y bajar muestran en los displays todos los numero entre 0 y 99 o los
