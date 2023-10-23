@@ -1,3 +1,5 @@
+https://www.tinkercad.com/things/f81LpTiQBXi-copy-of-parcial-parte-02/editel?sharecode=sewXvhS8cEUj8uMbXur-5BOwiuvHEq4caUjvRMVEe1o
+
 En la parte 3 del proyecto se incluyo un sensor de luz ambiental que segun la cantidad de luz que recibe se mueve mas o menos rapido el motor, tambien se incluyo un led que prende y apaga
 cuando el motor esta prendido, en el loop() se incluyo la lectura analogica del sensor de luz y con la funcion map() se escala los valores recibidos (0 - 1023) a (1 - 254), el valor recibido
 lo toma la funcion encenderMotor() que fue modificada poder darle las revolucion leidas al motor, la funcion ledAlerta() lo que hace es prender y apagar un led. 
