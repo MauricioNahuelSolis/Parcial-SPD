@@ -1,3 +1,17 @@
+https://www.tinkercad.com/things/gh2ZVDS51Dw-parcial-parte-01/editel?sharecode=k7zjiCcrLDLXsW94GfnwDnN-MdT3rLvF0IdviQ4dbn4
+
+primero se definen todos los pin a usar y las variables enteras, en el setup()
+se inician BAJA, SUBE, RESET que son los pines para los botones como imput_pullup
+los pines para los display se inician como output y se escriben la unidad y la decena en 0 para empezar el bucle, en el loop() se verifica el estado de los botones para poder incrementar, disminuir o resetear el contador que se imprime en los displays con al funcion imprimirCuenta().
+
+La funcion imprimirDigito() los que hace es, segun el numero recibido por el switch prender y apagar los diferentes segmentos del display para mostrar ese mismo numero.
+
+La funcion botonPresionado() se lee el estado de los botones, si el boton no esta presionado se asigna 1 a subir, bajar o resetear (previa) para tener el estado previo del boton, entonces, si el boton esta presionado y el estado previo no es presionado, se asigna el estado del boton al estodo previo y se retorna el boton (el que se presiono), en caso no haber presionado ningun boton, se retorna 0 para que no se haga nada. Esta funcion sirve para tener control sobre los botones y no tomar el estado del boton si se mantiene apretado.
+
+La funcion prendeDigito() se encarga de hacer la multiplexacion para poder tener prendido los dos display "a la vez", verificando si esta prendida la unidad, apagarla, prender la decena por un tiempo muy corto y viceversa, asi parece que estan prendidos los dos displays.
+
+La funcion imprimirCuenta() lo que hace es realizar unas cuentas para poder imprimir el numero generado en el contador del loop(), recibe el numero del contador, lo divide en 10, y el resultado lo muestra en el display de la decena, seguido de eso, ese mismo numero le resta 10 y lo multiplica por el numero dividido en 10 para obtener la unidad y asi imprimirlo.  
+
 # parte-01-parcial-spd
 // C++ code
 // Mauricio Solis del Castillo
@@ -242,15 +256,3 @@ void imprimirDigito(int digito)
     }  	
   }   	
 }
-
-primero se definen todos los pin a usar y las variables enteras, en el setup()
-se inician BAJA, SUBE, RESET que son los pines para los botones como imput_pullup
-los pines para los display se inician como output y se escriben la unidad y la decena en 0 para empezar el bucle, en el loop() se verifica el estado de los botones para poder incrementar, disminuir o resetear el contador que se imprime en los displays con al funcion imprimirCuenta().
-
-La funcion imprimirDigito() los que hace es, segun el numero recibido por el switch prender y apagar los diferentes segmentos del display para mostrar ese mismo numero.
-
-La funcion botonPresionado() se lee el estado de los botones, si el boton no esta presionado se asigna 1 a subir, bajar o resetear (previa) para tener el estado previo del boton, entonces, si el boton esta presionado y el estado previo no es presionado, se asigna el estado del boton al estodo previo y se retorna el boton (el que se presiono), en caso no haber presionado ningun boton, se retorna 0 para que no se haga nada. Esta funcion sirve para tener control sobre los botones y no tomar el estado del boton si se mantiene apretado.
-
-La funcion prendeDigito() se encarga de hacer la multiplexacion para poder tener prendido los dos display "a la vez", verificando si esta prendida la unidad, apagarla, prender la decena por un tiempo muy corto y viceversa, asi parece que estan prendidos los dos displays.
-
-La funcion imprimirCuenta() lo que hace es realizar unas cuentas para poder imprimir el numero generado en el contador del loop(), recibe el numero del contador, lo divide en 10, y el resultado lo muestra en el display de la decena, seguido de eso, ese mismo numero le resta 10 y lo multiplica por el numero dividido en 10 para obtener la unidad y asi imprimirlo.  
